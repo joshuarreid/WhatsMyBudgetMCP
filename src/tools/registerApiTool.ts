@@ -5,10 +5,23 @@ import { ApiError, QueryParams, WmbApiClient } from "../services/apiClient.js";
 
 type ApiToolSpec<TSchema extends z.ZodTypeAny> = {
   name: string;
+  title?: string;
   description: string;
+  whenToUse: string;
+  triggerWords?: string[];
   schema: TSchema;
   request: (args: z.output<TSchema>) => { path: string; query?: QueryParams };
 };
+
+function buildDescription(spec: Pick<ApiToolSpec<z.ZodTypeAny>, "description" | "whenToUse" | "triggerWords">): string {
+  const lines = [spec.description, `When to use: ${spec.whenToUse}`];
+
+  if (spec.triggerWords?.length) {
+    lines.push(`Trigger words: ${spec.triggerWords.join(", ")}`);
+  }
+
+  return lines.join("\n");
+}
 
 export function addApiTool<TSchema extends z.ZodTypeAny>(
   server: FastMCP,
@@ -17,7 +30,12 @@ export function addApiTool<TSchema extends z.ZodTypeAny>(
 ): void {
   server.addTool({
     name: spec.name,
-    description: spec.description,
+    description: buildDescription(spec),
+    annotations: {
+      title: spec.title ?? spec.name,
+      readOnlyHint: true,
+      openWorldHint: true,
+    },
     parameters: spec.schema,
     execute: async (args) => {
       try {
