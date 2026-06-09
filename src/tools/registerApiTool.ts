@@ -7,14 +7,21 @@ type ApiToolSpec<TSchema extends z.ZodTypeAny> = {
   name: string;
   title?: string;
   description: string;
+  beforeCalling?: string;
   whenToUse: string;
   triggerWords?: string[];
   schema: TSchema;
   request: (args: z.output<TSchema>) => { path: string; query?: QueryParams };
 };
 
-function buildDescription(spec: Pick<ApiToolSpec<z.ZodTypeAny>, "description" | "whenToUse" | "triggerWords">): string {
+function buildDescription(
+  spec: Pick<ApiToolSpec<z.ZodTypeAny>, "description" | "beforeCalling" | "whenToUse" | "triggerWords">
+): string {
   const lines = [spec.description, `When to use: ${spec.whenToUse}`];
+
+  if (spec.beforeCalling) {
+    lines.splice(1, 0, `Before calling: ${spec.beforeCalling}`);
+  }
 
   if (spec.triggerWords?.length) {
     lines.push(`Trigger words: ${spec.triggerWords.join(", ")}`);

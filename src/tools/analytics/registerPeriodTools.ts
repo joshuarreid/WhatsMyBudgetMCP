@@ -11,11 +11,15 @@ import {
 import { WmbApiClient } from "../../services/apiClient.js";
 import { addApiTool } from "../registerApiTool.js";
 
+const periodPreflightInstruction =
+  "Call analytics_periods_list first to confirm the requested period exists. If missing, ask the user to choose from available periods.";
+
 export function registerPeriodTools(server: FastMCP, client: WmbApiClient): void {
   addApiTool(server, client, {
     name: "analytics_period_overview",
     title: "Period Overview",
     description: "Get statement period totals and transaction count.",
+    beforeCalling: periodPreflightInstruction,
     whenToUse: "Use for a named statement period total and count, especially when the user says a month or billing period.",
     triggerWords: ["statement period", "period total", "monthly overview", "april 2026", "month spend"],
     schema: periodFilterSchema,
@@ -29,6 +33,7 @@ export function registerPeriodTools(server: FastMCP, client: WmbApiClient): void
     name: "analytics_period_categories",
     title: "Period Categories",
     description: "Get category breakdown for a statement period.",
+    beforeCalling: periodPreflightInstruction,
     whenToUse:
       "Use for category spending inside one statement period, including food questions where food should be interpreted as dining out plus groceries.",
     triggerWords: [
@@ -51,6 +56,7 @@ export function registerPeriodTools(server: FastMCP, client: WmbApiClient): void
     name: "analytics_period_categories_distinct",
     title: "Period Distinct Categories",
     description: "List distinct categories in a statement period.",
+    beforeCalling: periodPreflightInstruction,
     whenToUse: "Use to discover which categories exist in one statement period.",
     triggerWords: ["distinct categories", "list categories", "available categories"],
     schema: periodOnlySchema,
@@ -63,6 +69,7 @@ export function registerPeriodTools(server: FastMCP, client: WmbApiClient): void
     name: "analytics_period_categories_top",
     title: "Period Top Categories",
     description: "Get top categories for a statement period.",
+    beforeCalling: periodPreflightInstruction,
     whenToUse:
       "Use for top-N category questions inside one statement period, including food questions where food means dining out plus groceries.",
     triggerWords: ["top categories", "highest categories", "ranked categories", "food", "dining out", "groceries"],
@@ -81,6 +88,7 @@ export function registerPeriodTools(server: FastMCP, client: WmbApiClient): void
     name: "analytics_period_accounts",
     title: "Period Accounts",
     description: "Get account breakdown for a statement period.",
+    beforeCalling: periodPreflightInstruction,
     whenToUse: "Use for account totals inside one statement period.",
     triggerWords: ["by account", "account breakdown", "statement accounts"],
     schema: periodAccountSchema,
@@ -94,6 +102,7 @@ export function registerPeriodTools(server: FastMCP, client: WmbApiClient): void
     name: "analytics_period_payment_methods",
     title: "Period Payment Methods",
     description: "Get payment method breakdown for a statement period.",
+    beforeCalling: periodPreflightInstruction,
     whenToUse: "Use for payment-method totals inside one statement period.",
     triggerWords: ["payment methods", "cards", "cash", "statement payments"],
     schema: periodPaymentMethodSchema,
@@ -107,6 +116,7 @@ export function registerPeriodTools(server: FastMCP, client: WmbApiClient): void
     name: "analytics_period_criticality",
     title: "Period Criticality",
     description: "Get criticality breakdown for a statement period.",
+    beforeCalling: periodPreflightInstruction,
     whenToUse: "Use for criticality/severity breakdowns inside one statement period.",
     triggerWords: ["criticality", "severity", "risk"],
     schema: periodFilterSchema,
@@ -120,6 +130,7 @@ export function registerPeriodTools(server: FastMCP, client: WmbApiClient): void
     name: "analytics_period_daily",
     title: "Period Daily Totals",
     description: "Get daily totals for a statement period.",
+    beforeCalling: periodPreflightInstruction,
     whenToUse: "Use when you need day-by-day totals within one statement period.",
     triggerWords: ["daily totals", "by day", "day-by-day", "timeline"],
     schema: periodFilterSchema,
@@ -133,6 +144,7 @@ export function registerPeriodTools(server: FastMCP, client: WmbApiClient): void
     name: "analytics_period_duplicates",
     title: "Period Duplicates",
     description: "Find duplicate row hash groups for a statement period.",
+    beforeCalling: periodPreflightInstruction,
     whenToUse: "Use to detect duplicate transaction groups inside one statement period.",
     triggerWords: ["duplicates", "duplicate rows", "duplicate transactions"],
     schema: periodOnlySchema,
@@ -143,6 +155,7 @@ export function registerPeriodTools(server: FastMCP, client: WmbApiClient): void
     name: "analytics_period_uncategorized",
     title: "Period Uncategorized",
     description: "Get uncategorized transactions for a statement period.",
+    beforeCalling: periodPreflightInstruction,
     whenToUse: "Use to find uncategorized transactions inside one statement period.",
     triggerWords: ["uncategorized", "missing category", "unclassified"],
     schema: periodOnlySchema,
@@ -153,6 +166,7 @@ export function registerPeriodTools(server: FastMCP, client: WmbApiClient): void
     name: "analytics_period_outliers",
     title: "Period Outliers",
     description: "Get largest transactions in a statement period.",
+    beforeCalling: periodPreflightInstruction,
     whenToUse: "Use for largest or unusual transaction questions inside one statement period.",
     triggerWords: ["outliers", "largest transactions", "unusual spending", "biggest transactions"],
     schema: periodWithOutlierLimitSchema,
