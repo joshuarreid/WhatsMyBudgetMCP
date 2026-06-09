@@ -4,6 +4,12 @@ import { registerTools } from "./tools/index.js";
 
 export function createServer(client: WmbApiClient): FastMCP {
   const server = new FastMCP({
+    health: {
+      enabled: true,
+      message: "ok",
+      path: "/health",
+      status: 200,
+    },
     name: "whatsmybudget-analytics-mcp",
     version: "0.1.0",
     instructions:

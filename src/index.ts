@@ -8,6 +8,20 @@ async function main() {
   const apiClient = new WmbApiClient(config.baseUrl, config.bearerToken, config.timeoutMs);
   const server = createServer(apiClient);
 
+  if (config.runtimeTransport.type === "httpStream") {
+    const { host, port } = config.runtimeTransport;
+    process.stderr.write(`Starting MCP server over HTTP stream on ${host}:${port}\n`);
+    await server.start({
+      transportType: "httpStream",
+      httpStream: {
+        host,
+        port,
+      },
+    });
+    return;
+  }
+
+  process.stderr.write("Starting MCP server over stdio\n");
   await server.start({ transportType: "stdio" });
 }
 

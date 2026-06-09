@@ -21,6 +21,9 @@ Copy `.env.example` to `.env` and set values:
 - `WMB_API_BASE_URL` (example: `https://api.example.com`)
 - `WMB_BEARER_TOKEN` (optional; sent only when set)
 - `WMB_TIMEOUT_MS` (optional, default `15000`)
+- `WMB_TRANSPORT` (optional: `stdio` or `httpStream`; default auto-detect)
+- `PORT` (optional; when set, server defaults to `httpStream` on this port)
+- `WMB_HTTP_HOST` (optional; default `0.0.0.0` for `httpStream`)
 
 ## Project structure
 
@@ -121,7 +124,10 @@ npm start
 
 ## Production setup on DigitalOcean
 
-This server currently uses MCP `stdio` transport. That works best when the MCP client/agent can spawn the process directly on the same host.
+This server supports both MCP `stdio` and `httpStream` transports.
+
+- If `PORT` is set at runtime, it starts `httpStream` on `0.0.0.0:$PORT`.
+- Otherwise it defaults to `stdio` for local process-based MCP clients.
 
 ### Option A: DigitalOcean Droplet (recommended for stdio)
 
@@ -179,4 +185,4 @@ If your backend enforces auth, include `-e WMB_BEARER_TOKEN="your-token"`.
 
 ### App Platform note
 
-DigitalOcean App Platform is best for network-accessible HTTP services. Since this project is stdio-based today, App Platform is only a fit after adding FastMCP `httpStream` transport.
+DigitalOcean App Platform can run this server when `PORT` is injected by the platform (default behavior). The server will bind to `0.0.0.0:$PORT` and expose MCP at `/mcp` with health at `/health`.
