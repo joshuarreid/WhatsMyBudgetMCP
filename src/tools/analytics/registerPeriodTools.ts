@@ -29,8 +29,17 @@ export function registerPeriodTools(server: FastMCP, client: WmbApiClient): void
     name: "analytics_period_categories",
     title: "Period Categories",
     description: "Get category breakdown for a statement period.",
-    whenToUse: "Use for category spending inside one statement period.",
-    triggerWords: ["period categories", "monthly categories", "category breakdown"],
+    whenToUse:
+      "Use for category spending inside one statement period, including food questions where food should be interpreted as dining out plus groceries.",
+    triggerWords: [
+      "period categories",
+      "monthly categories",
+      "category breakdown",
+      "food",
+      "food spending",
+      "dining out",
+      "groceries",
+    ],
     schema: periodFilterSchema,
     request: (args) => ({
       path: `/periods/${encodeURIComponent(args.period)}/categories`,
@@ -54,8 +63,9 @@ export function registerPeriodTools(server: FastMCP, client: WmbApiClient): void
     name: "analytics_period_categories_top",
     title: "Period Top Categories",
     description: "Get top categories for a statement period.",
-    whenToUse: "Use for top-N category questions inside one statement period.",
-    triggerWords: ["top categories", "highest categories", "ranked categories"],
+    whenToUse:
+      "Use for top-N category questions inside one statement period, including food questions where food means dining out plus groceries.",
+    triggerWords: ["top categories", "highest categories", "ranked categories", "food", "dining out", "groceries"],
     schema: periodWithTopCategoryLimitSchema,
     request: (args) => ({
       path: `/periods/${encodeURIComponent(args.period)}/categories/top`,
