@@ -18,6 +18,7 @@ test("WmbApiClient sends bearer auth and query params", async () => {
   }) as typeof fetch;
 
   try {
+    // Static string token (legacy mode)
     const client = new WmbApiClient("https://api.example.com", "abc-token", 2000);
     const result = await client.get<{ ok: boolean }>("/range/overview", { startDate: "2026-01-01" }, "req-1");
 
@@ -26,6 +27,27 @@ test("WmbApiClient sends bearer auth and query params", async () => {
     assert.equal(observed.txId, "req-1");
     assert.equal(result.transactionId, "resp-1");
     assert.equal(result.data.ok, true);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("WmbApiClient uses custom apiPathPrefix", async () => {
+  const originalFetch = globalThis.fetch;
+  let capturedUrl = "";
+
+  globalThis.fetch = (async (input) => {
+    capturedUrl = String(input);
+    return new Response(JSON.stringify({}), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  }) as typeof fetch;
+
+  try {
+    const client = new WmbApiClient("https://api.example.com", undefined, 2000, "/api/v2/analytics");
+    await client.get("/periods");
+    assert.equal(capturedUrl, "https://api.example.com/api/v2/analytics/periods");
   } finally {
     globalThis.fetch = originalFetch;
   }

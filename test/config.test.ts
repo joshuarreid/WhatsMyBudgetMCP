@@ -9,6 +9,8 @@ test("loadConfig applies defaults and normalizes base URL", () => {
 
   assert.equal(config.baseUrl, "https://example.com");
   assert.equal(config.bearerToken, undefined);
+  assert.equal(config.password, undefined);
+  assert.equal(config.apiPathPrefix, "/api/analytics");
   assert.deepEqual(config.runtimeTransport, { type: "stdio" });
   assert.equal(config.timeoutMs, 15000);
 });
@@ -29,6 +31,26 @@ test("loadConfig keeps bearer token when provided", () => {
   });
 
   assert.equal(config.bearerToken, "token-123");
+  assert.equal(config.password, undefined);
+});
+
+test("loadConfig captures WMB_PASSWORD for JWT auth", () => {
+  const config = loadConfig({
+    WMB_API_BASE_URL: "https://example.com",
+    WMB_PASSWORD: "supersecret",
+  });
+
+  assert.equal(config.password, "supersecret");
+  assert.equal(config.bearerToken, undefined);
+});
+
+test("loadConfig respects WMB_API_PATH_PREFIX override", () => {
+  const config = loadConfig({
+    WMB_API_BASE_URL: "https://example.com",
+    WMB_API_PATH_PREFIX: "/api/v2/analytics",
+  });
+
+  assert.equal(config.apiPathPrefix, "/api/v2/analytics");
 });
 
 test("loadConfig switches to httpStream when PORT is present", () => {

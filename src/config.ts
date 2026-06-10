@@ -2,7 +2,16 @@ import { z } from "zod";
 
 const envSchema = z.object({
   WMB_API_BASE_URL: z.string().url(),
+  /** Plain-text password used to obtain a JWT via POST /auth/login (preferred for v2) */
+  WMB_PASSWORD: z.string().min(1).optional(),
+  /** Legacy static bearer token — used only when WMB_PASSWORD is not set */
   WMB_BEARER_TOKEN: z.string().min(1).optional(),
+  /**
+   * API path prefix for analytics endpoints.
+   * Default: /api/analytics (v1 legacy)
+   * For v2: set to /api/v2/analytics (or whichever path the backend exposes)
+   */
+  WMB_API_PATH_PREFIX: z.string().min(1).optional(),
   WMB_TRANSPORT: z.enum(["stdio", "httpStream"]).optional(),
   WMB_HTTP_HOST: z.string().min(1).optional(),
   PORT: z
@@ -29,7 +38,12 @@ export type RuntimeTransport =
 
 export type AppConfig = {
   baseUrl: string;
+  /** Set when using JWT auth (v2). Takes priority over bearerToken. */
+  password?: string;
+  /** Set when using static bearer token (legacy/local dev). */
   bearerToken?: string;
+  /** Base path prefix for analytics API calls. Default: /api/analytics */
+  apiPathPrefix: string;
   runtimeTransport: RuntimeTransport;
   timeoutMs: number;
 };
@@ -51,7 +65,9 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
 
   return {
     baseUrl: parsed.WMB_API_BASE_URL.replace(/\/+$/, ""),
+    password: parsed.WMB_PASSWORD,
     bearerToken: parsed.WMB_BEARER_TOKEN,
+    apiPathPrefix: parsed.WMB_API_PATH_PREFIX ?? "/api/analytics",
     runtimeTransport,
     timeoutMs: parsed.WMB_TIMEOUT_MS,
   };
